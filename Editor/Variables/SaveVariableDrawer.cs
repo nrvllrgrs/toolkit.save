@@ -6,7 +6,7 @@ using ToolkitEngine.SaveManagement;
 namespace ToolkitEditor.SaveManagement
 {
 	[CustomPropertyDrawer(typeof(SaveVariable<>), true)]
-    public class SaveVariableEditor : PropertyDrawer
+    public class SaveVariableDrawer : PropertyDrawer
     {
 		#region Fields
 
@@ -17,38 +17,59 @@ namespace ToolkitEditor.SaveManagement
 
 		#endregion
 
+		#region Constructors
+
+		~SaveVariableDrawer()
+		{
+			SaveVariableWindow.CollectionChanged -= Refresh;
+			SaveVariableWindow.EntryChanged -= Refresh;
+		}
+
+		#endregion
+
 		#region Methods
+
+		private void Refresh()
+		{
+			m_idToPathMap.Clear();
+			m_pathToIdMap.Clear();
+			m_paths.Clear();
+
+			var collections = AssetUtil.GetAssetsOfType<SaveDefinitionCollection>();
+			foreach (var collection in collections)
+			{
+				if (collection == null)
+					continue;
+
+				foreach (var definition in collection)
+				{
+					if (!IsValid(definition))
+						continue;
+
+					string path = $"{collection.name}/{definition.name}";
+					if (m_pathToIdMap.ContainsKey(path))
+						continue;
+
+					m_idToPathMap.Add(definition.id, path);
+					m_pathToIdMap.Add(path, definition.id);
+					m_paths.Add(path);
+				}
+			}
+
+			m_paths.Insert(0, "[Empty]");
+
+			SaveVariableWindow.CollectionChanged += Refresh;
+			SaveVariableWindow.EntryChanged += Refresh;
+		}
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			if (m_id == null)
 			{
 				m_id = property.FindPropertyRelative(nameof(m_id));
+				Refresh();
 
-				m_pathToIdMap.Clear();
 
-				var collections = AssetUtil.GetAssetsOfType<SaveDefinitionCollection>();
-				foreach (var collection in collections)
-				{
-					if (collection == null)
-						continue;
-
-					foreach (var definition in collection)
-					{
-						if (!IsValid(definition))
-							continue;
-
-						string path = $"{collection.name}/{definition.name}";
-						if (m_pathToIdMap.ContainsKey(path))
-							continue;
-
-						m_idToPathMap.Add(definition.id, path);
-						m_pathToIdMap.Add(path, definition.id);
-						m_paths.Add(path);
-					}
-				}
-
-				m_paths.Insert(0, "[Empty]");
 			}
 
 			int selectedIndex = 0;

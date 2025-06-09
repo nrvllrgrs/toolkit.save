@@ -4,7 +4,7 @@ using UnityEditor;
 namespace ToolkitEditor.SaveManagement
 {
 	[CustomPropertyDrawer(typeof(SaveVector2Int))]
-	public class SaveVector2IntEditor : SaveVariableEditor
+	public class SaveVector2IntEditor : SaveVariableDrawer
 	{
 		protected override bool IsValid(SaveDefinition definition)
 		{

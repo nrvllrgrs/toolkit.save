@@ -25,6 +25,13 @@ namespace ToolkitEditor.SaveManagement
 
 		#endregion
 
+		#region Events
+
+		public static Action CollectionChanged;
+		public static Action EntryChanged;
+
+		#endregion
+
 		#region Properties
 
 		private static SaveVariableWindow instance => GetWindow<SaveVariableWindow>();
@@ -112,6 +119,7 @@ namespace ToolkitEditor.SaveManagement
 			m_selectedCollectionDropdown.value = collection.name;
 
 			m_selectedCollection = collection;
+			CollectionChanged?.Invoke();
 		}
 
 		private void NewEntry_Clicked()
@@ -137,6 +145,7 @@ namespace ToolkitEditor.SaveManagement
 			EditorUtility.SetDirty(m_selectedCollection);
 
 			m_multiColumnListView.RefreshItems();
+			EntryChanged?.Invoke();
 		}
 
 		private void SelectedCollection_ValueChanged(ChangeEvent<string> args)
@@ -166,6 +175,7 @@ namespace ToolkitEditor.SaveManagement
 			nameColumn.makeCell = () =>
 			{
 				var nameField = new TextField();
+				nameField.isDelayed = true;
 				nameField.RegisterValueChangedCallback(NameDefinition_ValueChanged);
 
 				if (Application.isPlaying)
@@ -322,6 +332,7 @@ namespace ToolkitEditor.SaveManagement
 
 			m_selectedCollection[(int)textField.userData].name = textField.text;
 			EditorUtility.SetDirty(m_selectedCollection);
+			EntryChanged?.Invoke();
 		}
 
 		private static void ResetButton_Clicked(ClickEvent e)
@@ -347,6 +358,8 @@ namespace ToolkitEditor.SaveManagement
 			m_selectedCollection.RemoveAt(index);
 			m_multiColumnListView.RefreshItems();
 			EditorUtility.SetDirty(m_selectedCollection);
+
+			EntryChanged?.Invoke();
 		}
 
 		private Button CreateButton(Texture2D icon, EventCallback<ClickEvent> clickCallback, string tooltip = null)
