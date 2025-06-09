@@ -1,0 +1,32 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Save%20Toolkit/Editor/Styles/DefaultCommonDark.uss?fileID=7433441132597879392&amp;guid=1a1f7947f137c834aa4fbd599ad42604&amp;type=3#DefaultCommonDark" />
+    <Style src="project://database/Assets/Save%20Toolkit/Editor/Styles/ToolbarDark.uss?fileID=7433441132597879392&amp;guid=2fe0018c80450c1478b294468f09c2a3&amp;type=3#ToolbarDark" />
+    <ui:VisualElement name="toolbar" class="unity-toolbar" style="flex-grow: initial; flex-direction: row; justify-content: flex-start; top: 0; position: absolute; width: 100%;">
+        <ui:DropdownField label="Selected Collection" name="selectedCollection" style="width: 60%; align-items: stretch; justify-content: space-evenly; align-self: stretch;" />
+        <ui:Button text="+ New Collection" name="newCollection" class="unity-toolbar-button" />
+        <ui:Button text="+ New Entry" name="newEntry" class="unity-toolbar-button" />
+    </ui:VisualElement>
+    <ui:MultiColumnListView name="list" sorting-mode="Default" show-alternating-row-backgrounds="All" virtualization-method="DynamicHeight" style="position: absolute; top: 21px; bottom: 21px; width: 100%;">
+        <ui:Columns resize-preview="true">
+            <ui:Column name="name" title="Name" optional="false" stretchable="true" />
+            <ui:Column name="id" title="ID" stretchable="true" />
+            <ui:Column name="type" title="Type" stretchable="true" />
+            <ui:Column name="defaultValue" title="Default Value" sortable="false" stretchable="true" />
+            <ui:Column name="currentValue" title="Current Value" sortable="false" stretchable="true" />
+            <ui:Column name="reset" sortable="false" optional="false" max-width="35px" title="Reset" />
+            <ui:Column name="remove" sortable="false" optional="false" max-width="35px" title="Delete" />
+        </ui:Columns>
+        <ui:SortColumnDescriptions />
+    </ui:MultiColumnListView>
+    <ui:VisualElement name="footer" class="unity-toolbar" style="flex-direction: row; justify-content: space-between; bottom: 0; position: absolute; width: 100%; background-size: 100% 21px;">
+        <ui:VisualElement name="pageControl" class="unity-toolbar" style="flex-grow: 1; flex-direction: row; align-items: stretch; justify-content: flex-start;">
+            <ui:Button name="firstPage" icon-image="project://database/Assets/Save%20Toolkit/Editor/Icons/FirstKey.png?fileID=2800000&amp;guid=71108d4970c645a40b8bf89b27bee43c&amp;type=3#FirstKey" class="unity-toolbar-button" style="white-space: pre;" />
+            <ui:Button name="prevPage" icon-image="project://database/Assets/Save%20Toolkit/Editor/Icons/PrevKey.png?fileID=2800000&amp;guid=7efe69b768d9b724ea4371b88efb7113&amp;type=3#PrevKey" class="unity-toolbar-button" />
+            <ui:IntegerField value="1" name="pageIndex" />
+            <ui:Label text="/1" name="pageCount" style="align-self: center;" />
+            <ui:Button name="nextPage" icon-image="project://database/Assets/Save%20Toolkit/Editor/Icons/NextKey.png?fileID=2800000&amp;guid=1823752ea58cc9e42bc1428d10917e6a&amp;type=3#NextKey" class="unity-toolbar-button" />
+            <ui:Button name="lastPage" icon-image="project://database/Assets/Save%20Toolkit/Editor/Icons/LastKey.png?fileID=2800000&amp;guid=df7075fa7b2e25b44817871fb15e64c8&amp;type=3#LastKey" class="unity-toolbar-button" />
+        </ui:VisualElement>
+        <ui:IntegerField label="Page Size" value="50" name="pageSize" />
+    </ui:VisualElement>
+</ui:UXML>

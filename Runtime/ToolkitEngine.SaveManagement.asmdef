@@ -1,0 +1,17 @@
+{
+    "name": "ToolkitEngine.SaveManagement",
+    "rootNamespace": "",
+    "references": [
+        "GUID:0b2b191acd5ecdb4da1dd2e73cbe1d45",
+        "GUID:17c27417ae3fd225c5f23487ac3888b6"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
