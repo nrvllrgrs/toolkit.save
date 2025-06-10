@@ -10,7 +10,8 @@ namespace ToolkitEngine.SaveManagement
     {
 		#region Fields
 
-		private Dictionary<string, object> m_map = new();
+		private Dictionary<string, object> m_variableMap = new();
+		private HashSet<ISaveable> m_saveables = new();
 
 		#endregion
 
@@ -22,7 +23,7 @@ namespace ToolkitEngine.SaveManagement
 			{
 				foreach (var entry in collection)
 				{
-					m_map.Add(entry.id, entry.value);
+					m_variableMap.Add(entry.id, entry.value);
 				}
 			}
 		}
@@ -34,7 +35,12 @@ namespace ToolkitEngine.SaveManagement
 
 		public void Save(string path)
 		{
-			byte[] bytes = SerializationUtility.SerializeValue(m_map, DataFormat.Binary);
+			foreach (var saveable in m_saveables)
+			{
+				saveable.Save();
+			}
+
+			byte[] bytes = SerializationUtility.SerializeValue(m_variableMap, DataFormat.Binary);
 			File.WriteAllBytes(path, bytes);
 		}
 
@@ -49,7 +55,7 @@ namespace ToolkitEngine.SaveManagement
 				return;
 
 			byte[] bytes = File.ReadAllBytes(path);
-			m_map = SerializationUtility.DeserializeValue<Dictionary<string, object>>(bytes, DataFormat.Binary);
+			m_variableMap = SerializationUtility.DeserializeValue<Dictionary<string, object>>(bytes, DataFormat.Binary);
 		}
 
 		public bool ContainsId(string id)
@@ -64,7 +70,7 @@ namespace ToolkitEngine.SaveManagement
 			}
 #endif
 
-			return m_map.ContainsKey(id);
+			return m_variableMap.ContainsKey(id);
 		}
 
 
@@ -87,7 +93,7 @@ namespace ToolkitEngine.SaveManagement
 			}
 #endif
 
-			if (m_map.TryGetValue(id, out var v))
+			if (m_variableMap.TryGetValue(id, out var v))
 			{
 				value = (T)v;
 				return true;
@@ -99,29 +105,43 @@ namespace ToolkitEngine.SaveManagement
 
 		public bool TrySetValue<T>(string id, T value)
 		{
-			if (!m_map.ContainsKey(id))
+			if (!m_variableMap.ContainsKey(id))
 				return false;
 
-			m_map[id] = value;
+			m_variableMap[id] = value;
 			return true;
 		}
 
 		public bool Add(string id, object value)
 		{
-			if (m_map.ContainsKey(id))
+			if (m_variableMap.ContainsKey(id))
 				return false;
 
-			m_map.Add(id, value);
+			m_variableMap.Add(id, value);
 			return true;
 		}
 
 		public bool Remove(string id)
 		{
-			if (!m_map.ContainsKey(id))
+			if (!m_variableMap.ContainsKey(id))
 				return false;
 
-			m_map.Remove(id);
+			m_variableMap.Remove(id);
 			return true;
+		}
+
+		#endregion
+
+		#region Saveable Methods
+
+		public void Register(ISaveable saveable)
+		{
+			m_saveables.Add(saveable);
+		}
+
+		public void Unregister(ISaveable saveable)
+		{
+			m_saveables.Remove(saveable);
 		}
 
 		#endregion

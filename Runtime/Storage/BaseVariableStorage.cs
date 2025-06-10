@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ToolkitEngine.SaveManagement
 {
-    public abstract class BaseVariableStorage<T, K> : MonoBehaviour
+    public abstract class BaseVariableStorage<T, K> : MonoBehaviour, ISaveable
 		where K : SaveVariable<T>
     {
 		#region Fields
@@ -50,6 +50,19 @@ namespace ToolkitEngine.SaveManagement
 			if (m_loadOnStart)
 			{
 				Load();
+			}
+		}
+
+		private void OnEnable()
+		{
+			SaveManager.CastInstance.Register(this);
+		}
+
+		private void OnDisable()
+		{
+			if (SaveManager.Exists)
+			{
+				SaveManager.CastInstance.Unregister(this);
 			}
 		}
 
