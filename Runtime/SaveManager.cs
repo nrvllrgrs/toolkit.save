@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace ToolkitEngine.SaveManagement
 {
-    public class SaveManager : ConfigurableSubsystem<SaveManager, SaveManagerConfig>
+	public class SaveManager : ConfigurableSubsystem<SaveManager, SaveManagerConfig>
     {
 		#region Fields
 
@@ -51,6 +51,22 @@ namespace ToolkitEngine.SaveManagement
 			byte[] bytes = File.ReadAllBytes(path);
 			m_map = SerializationUtility.DeserializeValue<Dictionary<string, object>>(bytes, DataFormat.Binary);
 		}
+
+		public bool ContainsId(string id)
+		{
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+			{
+				var definition = Config.collections.SelectMany(x => x)
+					.FirstOrDefault(x => Equals(x.id, id));
+
+				return definition != null;
+			}
+#endif
+
+			return m_map.ContainsKey(id);
+		}
+
 
 		public bool TryGetValue<T>(string id, out T value)
 		{

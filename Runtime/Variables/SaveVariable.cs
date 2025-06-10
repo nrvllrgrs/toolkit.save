@@ -35,6 +35,8 @@ namespace ToolkitEngine.SaveManagement
 			}
 		}
 
+		public bool isDefined => !string.IsNullOrWhiteSpace(m_id) && SaveManager.CastInstance.ContainsId(m_id);
+
 		#endregion
 	}
 }
