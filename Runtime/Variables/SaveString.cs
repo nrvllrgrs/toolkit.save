@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace ToolkitEngine.SaveManagement
 {
 	[System.Serializable]

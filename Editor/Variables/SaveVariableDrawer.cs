@@ -10,7 +10,8 @@ namespace ToolkitEditor.SaveManagement
     {
 		#region Fields
 
-		private SerializedProperty m_id;
+		private bool m_initialized = false;
+
 		private Dictionary<string, string> m_idToPathMap = new();
 		private Dictionary<string, string> m_pathToIdMap = new();
 		private List<string> m_paths = new();
@@ -54,9 +55,14 @@ namespace ToolkitEditor.SaveManagement
 					m_pathToIdMap.Add(path, definition.id);
 					m_paths.Add(path);
 				}
+
+				m_paths.Sort();
 			}
 
 			m_paths.Insert(0, "[Empty]");
+
+			SaveVariableWindow.CollectionChanged -= Refresh;
+			SaveVariableWindow.EntryChanged -= Refresh;
 
 			SaveVariableWindow.CollectionChanged += Refresh;
 			SaveVariableWindow.EntryChanged += Refresh;
@@ -64,19 +70,19 @@ namespace ToolkitEditor.SaveManagement
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			if (m_id == null)
+			if (!m_initialized)
 			{
-				m_id = property.FindPropertyRelative(nameof(m_id));
 				Refresh();
-
-
+				m_initialized = true;
 			}
+
+			var id = property.FindPropertyRelative("m_id");
 
 			int selectedIndex = 0;
 			EditorGUI.BeginChangeCheck();
 			{
-				if (!string.IsNullOrWhiteSpace(m_id.stringValue)
-					&& m_idToPathMap.TryGetValue(m_id.stringValue, out var path))
+				if (!string.IsNullOrWhiteSpace(id.stringValue)
+					&& m_idToPathMap.TryGetValue(id.stringValue, out var path))
 				{
 					selectedIndex = Mathf.Max(m_paths.IndexOf(path, 0));
 				}
@@ -97,13 +103,13 @@ namespace ToolkitEditor.SaveManagement
 			}
 			if (EditorGUI.EndChangeCheck())
 			{
-				m_id.stringValue = selectedIndex > 0
+				id.stringValue = selectedIndex > 0
 					? m_pathToIdMap[m_paths[selectedIndex]]
 					: string.Empty;
 			}
 
-			if (!string.IsNullOrWhiteSpace(m_id.stringValue)
-				&& SaveManager.CastInstance.TryGetValue(m_id.stringValue, out object value))
+			if (!string.IsNullOrWhiteSpace(id.stringValue)
+				&& SaveManager.CastInstance.TryGetValue(id.stringValue, out object value))
 			{
 				EditorGUIRectLayout.LabelField(ref position, null, value?.ToString() ?? string.Empty);
 			}
@@ -114,7 +120,9 @@ namespace ToolkitEditor.SaveManagement
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			float height = EditorGUIUtility.singleLineHeight;
-			if (m_id != null && !string.IsNullOrWhiteSpace(m_id.stringValue))
+
+			var id = property.FindPropertyRelative("m_id");
+			if (!string.IsNullOrWhiteSpace(id.stringValue))
 			{
 				height += EditorGUIUtility.singleLineHeight
 					+ EditorGUIUtility.standardVerticalSpacing;
