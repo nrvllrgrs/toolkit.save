@@ -31,6 +31,9 @@ namespace ToolkitEngine.SaveManagement
 		}
 
 		public abstract string typeName { get; }
+
+		public Action defaultGUIHandler { get; protected set; }
+		public Action currentGUIHandler { get; protected set; }
 #endif
 		#endregion
 	}
@@ -52,7 +55,7 @@ namespace ToolkitEngine.SaveManagement
 		public T castValue
 		{
 			get => m_defaultValue;
-			internal set => m_defaultValue = value;
+			set => m_defaultValue = value;
 		}
 
 #if UNITY_EDITOR

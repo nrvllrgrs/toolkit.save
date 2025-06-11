@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using ToolkitEngine.SaveManagement;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -20,6 +21,7 @@ namespace ToolkitEditor.SaveManagement
 
 		private IList<SaveDefinitionCollection> m_collections;
 		private SaveDefinitionCollection m_selectedCollection = null;
+		private SerializedObject m_serializedSelectedCollection = null;
 
 		private const string SELECTED_COLLECTION_PREF = "SaveVariableWindow.SelectedCollection";
 
@@ -152,6 +154,7 @@ namespace ToolkitEditor.SaveManagement
 		{
 			m_selectedCollection = m_collections[m_selectedCollectionDropdown.index];
 			m_multiColumnListView.itemsSource = m_selectedCollection;
+			m_serializedSelectedCollection = new SerializedObject(m_selectedCollection);
 
 			EditorPrefs.SetString(SELECTED_COLLECTION_PREF, AssetUtil.GetGUID(m_selectedCollection));
 		}
@@ -253,6 +256,20 @@ namespace ToolkitEditor.SaveManagement
 					case Type vector4Definition when vector4Definition == typeof(Vector4Definition):
 						element.Add(CreateDefinitionCell(definition, index, new Vector4Field(), Vector4Definition_ValueChanged));
 						break;
+
+					default:
+						var imguiContainer = new IMGUIContainer(definition.defaultGUIHandler)
+						{
+							enabledSelf = !Application.isPlaying,
+							userData = index,
+						};
+						imguiContainer.Bind(m_serializedSelectedCollection);
+						imguiContainer.TrackSerializedObjectValue(m_serializedSelectedCollection, (serializedObject) =>
+						{
+							EditorUtility.SetDirty(m_selectedCollection);
+						});
+						element.Add(imguiContainer);
+						break;
 				}
 			};
 
@@ -302,6 +319,10 @@ namespace ToolkitEditor.SaveManagement
 
 					case Type vector4Definition when vector4Definition == typeof(Vector4Definition):
 						element.Add(CreateVariableCell(definition, index, new Vector4Field()));
+						break;
+
+					default:
+						element.Add(CreateVariableCell(definition, index));
 						break;
 				}
 			};
@@ -494,6 +515,15 @@ namespace ToolkitEditor.SaveManagement
 			field.SetEnabled(false);
 
 			return field;
+		}
+
+		private VisualElement CreateVariableCell(SaveDefinition definition, int index)
+		{
+			return new IMGUIContainer(definition.currentGUIHandler)
+			{
+				enabledSelf = false,
+				userData = index,
+			};
 		}
 
 		#endregion
