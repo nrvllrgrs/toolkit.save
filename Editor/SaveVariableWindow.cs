@@ -219,58 +219,17 @@ namespace ToolkitEditor.SaveManagement
 					element.RemoveAt(i);
 				}
 
-				switch (definition.GetType())
+				var imguiContainer = new IMGUIContainer(definition.defaultGUIHandler)
 				{
-					case Type boolDefinition when boolDefinition == typeof(BoolDefinition):
-						element.Add(CreateDefinitionCell(definition, index, new Toggle(), BoolDefinition_ValueChanged));
-						break;
-
-					case Type intDefinition when intDefinition == typeof(IntDefinition):
-						element.Add(CreateDefinitionCell(definition, index, new IntegerField(), IntDefinition_ValueChanged));
-						break;
-
-					case Type floatDefinition when floatDefinition == typeof(FloatDefinition):
-						element.Add(CreateDefinitionCell(definition, index, new FloatField(), FloatDefinition_ValueChanged));
-						break;
-
-					case Type stringDefinition when stringDefinition == typeof(StringDefinition):
-						element.Add(CreateDefinitionCell(definition, index, new TextField(), StringDefinition_ValueChanged));
-						break;
-
-					case Type vector2Definition when vector2Definition == typeof(Vector2Definition):
-						element.Add(CreateDefinitionCell(definition, index, new Vector2Field(), Vector2Definition_ValueChanged));
-						break;
-
-					case Type vector2IntDefinition when vector2IntDefinition == typeof(Vector2IntDefinition):
-						element.Add(CreateDefinitionCell(definition, index, new Vector2IntField(), Vector2IntDefinition_ValueChanged));
-						break;
-
-					case Type vector3Definition when vector3Definition == typeof(Vector3Definition):
-						element.Add(CreateDefinitionCell(definition, index, new Vector3Field(), Vector3Definition_ValueChanged));
-						break;
-
-					case Type vector3IntDefinition when vector3IntDefinition == typeof(Vector3IntDefinition):
-						element.Add(CreateDefinitionCell(definition, index, new Vector3IntField(), Vector3IntDefinition_ValueChanged));
-						break;
-
-					case Type vector4Definition when vector4Definition == typeof(Vector4Definition):
-						element.Add(CreateDefinitionCell(definition, index, new Vector4Field(), Vector4Definition_ValueChanged));
-						break;
-
-					default:
-						var imguiContainer = new IMGUIContainer(definition.defaultGUIHandler)
-						{
-							enabledSelf = !Application.isPlaying,
-							userData = index,
-						};
-						imguiContainer.Bind(m_serializedSelectedCollection);
-						imguiContainer.TrackSerializedObjectValue(m_serializedSelectedCollection, (serializedObject) =>
-						{
-							EditorUtility.SetDirty(m_selectedCollection);
-						});
-						element.Add(imguiContainer);
-						break;
-				}
+					enabledSelf = !Application.isPlaying,
+					userData = index,
+				};
+				imguiContainer.Bind(m_serializedSelectedCollection);
+				imguiContainer.TrackSerializedObjectValue(m_serializedSelectedCollection, (serializedObject) =>
+				{
+					EditorUtility.SetDirty(m_selectedCollection);
+				});
+				element.Add(imguiContainer);
 			};
 
 			var curentValueColumn = m_multiColumnListView.columns["currentValue"];
@@ -283,48 +242,11 @@ namespace ToolkitEditor.SaveManagement
 					element.RemoveAt(i);
 				}
 
-				switch (definition.GetType())
+				element.Add(new IMGUIContainer(definition.currentGUIHandler)
 				{
-					case Type boolDefinition when boolDefinition == typeof(BoolDefinition):
-						element.Add(CreateVariableCell(definition, index, new Toggle()));
-						break;
-
-					case Type intDefinition when intDefinition == typeof(IntDefinition):
-						element.Add(CreateVariableCell(definition, index, new IntegerField()));
-						break;
-
-					case Type floatDefinition when floatDefinition == typeof(FloatDefinition):
-						element.Add(CreateVariableCell(definition, index, new FloatField()));
-						break;
-
-					case Type stringDefinition when stringDefinition == typeof(StringDefinition):
-						element.Add(CreateVariableCell(definition, index, new TextField()));
-						break;
-
-					case Type vector2Definition when vector2Definition == typeof(Vector2Definition):
-						element.Add(CreateVariableCell(definition, index, new Vector2Field()));
-						break;
-
-					case Type vector2IntDefinition when vector2IntDefinition == typeof(Vector2IntDefinition):
-						element.Add(CreateVariableCell(definition, index, new Vector2IntField()));
-						break;
-
-					case Type vector3Definition when vector3Definition == typeof(Vector3Definition):
-						element.Add(CreateVariableCell(definition, index, new Vector3Field()));
-						break;
-
-					case Type vector3IntDefinition when vector3IntDefinition == typeof(Vector3IntDefinition):
-						element.Add(CreateVariableCell(definition, index, new Vector3IntField()));
-						break;
-
-					case Type vector4Definition when vector4Definition == typeof(Vector4Definition):
-						element.Add(CreateVariableCell(definition, index, new Vector4Field()));
-						break;
-
-					default:
-						element.Add(CreateVariableCell(definition, index));
-						break;
-				}
+					enabledSelf = false,
+					userData = index,
+				});
 			};
 
 
@@ -401,129 +323,6 @@ namespace ToolkitEditor.SaveManagement
 			}
 
 			return button;
-		}
-
-		#endregion
-
-		#region Definition Cell Methods
-
-		private VisualElement CreateDefinitionCell<T>(SaveDefinition definition, int index, BaseField<T> field, EventCallback<ChangeEvent<T>> callback)
-		{
-			field.value = (definition as SaveDefinition<T>).castValue;
-			field.RegisterValueChangedCallback(callback);
-			field.userData = index;
-
-			if (Application.isPlaying)
-			{
-				field.SetEnabled(false);
-			}
-
-			return field;
-		}
-
-		private void BoolDefinition_ValueChanged(ChangeEvent<bool> args)
-		{
-			SaveDefinition_ValueChanged(args.currentTarget, (element) =>
-			{
-				return (element as Toggle).value;
-			});
-		}
-
-		private void IntDefinition_ValueChanged(ChangeEvent<int> args)
-		{
-			SaveDefinition_ValueChanged(args.currentTarget, (element) =>
-			{
-				return (element as IntegerField).value;
-			});
-		}
-
-		private void FloatDefinition_ValueChanged(ChangeEvent<float> args)
-		{
-			SaveDefinition_ValueChanged(args.currentTarget, (element) =>
-			{
-				return (element as FloatField).value;
-			});
-		}
-
-		private void StringDefinition_ValueChanged(ChangeEvent<string> args)
-		{
-			SaveDefinition_ValueChanged(args.currentTarget, (element) =>
-			{
-				return (element as TextField).value;
-			});
-		}
-
-		private void Vector2Definition_ValueChanged(ChangeEvent<Vector2> args)
-		{
-			SaveDefinition_ValueChanged(args.currentTarget, (element) =>
-			{
-				return (element as Vector2Field).value;
-			});
-		}
-
-		private void Vector2IntDefinition_ValueChanged(ChangeEvent<Vector2Int> args)
-		{
-			SaveDefinition_ValueChanged(args.currentTarget, (element) =>
-			{
-				return (element as Vector2IntField).value;
-			});
-		}
-
-		private void Vector3Definition_ValueChanged(ChangeEvent<Vector3> args)
-		{
-			SaveDefinition_ValueChanged(args.currentTarget, (element) =>
-			{
-				return (element as Vector3Field).value;
-			});
-		}
-
-		private void Vector3IntDefinition_ValueChanged(ChangeEvent<Vector3Int> args)
-		{
-			SaveDefinition_ValueChanged(args.currentTarget, (element) =>
-			{
-				return (element as Vector3IntField).value;
-			});
-		}
-
-		private void Vector4Definition_ValueChanged(ChangeEvent<Vector4> args)
-		{
-			SaveDefinition_ValueChanged(args.currentTarget, (element) =>
-			{
-				return (element as Vector4Field).value;
-			});
-		}
-
-		private void SaveDefinition_ValueChanged<T>(IEventHandler target, Func<VisualElement, T> getValue)
-		{
-			var element = target as VisualElement;
-			if (element == null)
-				return;
-
-			(m_selectedCollection[(int)element.userData] as SaveDefinition<T>).castValue = getValue(element);
-			EditorUtility.SetDirty(m_selectedCollection);
-		}
-
-		#endregion
-
-		#region Variable Cell Methods
-
-		private VisualElement CreateVariableCell<T>(SaveDefinition definition, int index, BaseField<T> field)
-		{
-			SaveManager.CastInstance.TryGetValue(definition.id, out T value);
-			field.value = value;
-			field.userData = index;
-			field.SetEnabled(false);
-
-			return field;
-		}
-
-		private VisualElement CreateVariableCell(SaveDefinition definition, int index)
-		{
-			return new IMGUIContainer(definition.currentGUIHandler)
-			{
-				enabledSelf = false,
-				userData = index,
-			};
 		}
 
 		#endregion
