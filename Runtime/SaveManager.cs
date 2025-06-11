@@ -21,6 +21,9 @@ namespace ToolkitEngine.SaveManagement
 		{
 			foreach (var collection in Config.collections)
 			{
+				if (collection == null)
+					continue;
+
 				foreach (var entry in collection)
 				{
 					m_variableMap.Add(entry.id, entry.value);
