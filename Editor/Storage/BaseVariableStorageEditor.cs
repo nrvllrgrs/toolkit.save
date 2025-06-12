@@ -21,12 +21,16 @@ namespace ToolkitEditor.SaveManagement
 		protected SerializedProperty m_loadOnStart;
 		protected SerializedProperty m_saveOnDestroy;
 
+		private System.Type m_variableType;
+
 		#endregion
 
 		#region Methods
 
 		private void OnEnable()
 		{
+			m_variableType = (target as IVariableStorage).variableType;
+
 			m_object = serializedObject.FindProperty(nameof(m_object));
 			m_component = serializedObject.FindProperty(nameof(m_component));
 			m_memberName = serializedObject.FindProperty(nameof(m_memberName));
@@ -98,12 +102,12 @@ namespace ToolkitEditor.SaveManagement
 			{
 				AddMenuItems<FieldInfo>(component.GetType().GetFields().Where(x => x.IsPublic), (field) =>
 				{
-					return field.FieldType == typeof(float);
+					return field.FieldType == m_variableType;
 				}, menu, HandleMemberInfoClicked, component, false);
 
 				AddMenuItems<PropertyInfo>(component.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance), (prop) =>
 				{
-					return prop.PropertyType == typeof(float);
+					return prop.PropertyType == m_variableType;
 				}, menu, HandleMemberInfoClicked, component, true);
 			}
 		}

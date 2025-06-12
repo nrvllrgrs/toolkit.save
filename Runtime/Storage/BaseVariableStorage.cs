@@ -1,9 +1,15 @@
 using System.Reflection;
 using UnityEngine;
+using Yarn;
 
 namespace ToolkitEngine.SaveManagement
 {
-    public abstract class BaseVariableStorage<T, K> : MonoBehaviour, ISaveable
+	public interface IVariableStorage
+	{
+		System.Type variableType { get; }
+	}
+
+	public abstract class BaseVariableStorage<T, K> : MonoBehaviour, ISaveable, IVariableStorage
 		where K : SaveVariable<T>
     {
 		#region Fields
@@ -30,6 +36,12 @@ namespace ToolkitEngine.SaveManagement
 		private bool m_saveOnDestroy;
 
 		private MemberInfo m_memberInfo = null;
+
+		#endregion
+
+		#region Properties
+
+		public System.Type variableType => typeof(T);
 
 		#endregion
 

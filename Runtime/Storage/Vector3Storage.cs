@@ -3,6 +3,7 @@ using UnityEngine.Events;
 
 namespace ToolkitEngine.SaveManagement
 {
-    public class Vector3Storage : BaseVariableStorage<Vector3, SaveVector3>
+	[AddComponentMenu("Save/Vector3 Storage")]
+	public class Vector3Storage : BaseVariableStorage<Vector3, SaveVector3>
     { }
 }

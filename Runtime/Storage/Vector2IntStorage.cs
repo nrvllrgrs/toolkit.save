@@ -1,8 +1,8 @@
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace ToolkitEngine.SaveManagement
 {
-    public class Vector2IntStorage : BaseVariableStorage<Vector2Int, SaveVector2Int>
+	[AddComponentMenu("Save/Vector2Int Storage")]
+	public class Vector2IntStorage : BaseVariableStorage<Vector2Int, SaveVector2Int>
     { }
 }

@@ -2,7 +2,8 @@ using UnityEngine;
 
 namespace ToolkitEngine.SaveManagement
 {
-    public class TransformStorage : MonoBehaviour, ISaveable
+	[AddComponentMenu("Save/Transform Storage")]
+	public class TransformStorage : MonoBehaviour, ISaveable
     {
 		#region Fields
 
