@@ -1,6 +1,6 @@
 using System.Reflection;
 using UnityEngine;
-using Yarn;
+using UnityEngine.Events;
 
 namespace ToolkitEngine.SaveManagement
 {
@@ -15,33 +15,46 @@ namespace ToolkitEngine.SaveManagement
 		#region Fields
 
 		[SerializeField]
-		private Object m_object;
+		protected Object m_object;
 
 		[SerializeField]
-		private Component m_component;
+		protected Component m_component;
 
 		[SerializeField]
-		private string m_memberName;
+		protected string m_memberName;
 
 		[SerializeField]
-		private bool m_isProperty;
+		protected bool m_isProperty;
 
 		[SerializeField]
-		private K m_variable;
+		protected K m_variable;
 
 		[SerializeField]
-		private bool m_loadOnStart;
+		protected bool m_loadOnStart;
 
 		[SerializeField]
-		private bool m_saveOnDestroy;
+		protected bool m_saveOnDestroy;
 
 		private MemberInfo m_memberInfo = null;
+
+		#endregion
+
+		#region Events
+
+		[SerializeField]
+		protected UnityEvent<T> m_onLoaded;
+
+		[SerializeField]
+		protected UnityEvent<T> m_onSaved;
 
 		#endregion
 
 		#region Properties
 
 		public System.Type variableType => typeof(T);
+
+		public UnityEvent<T> onLoaded => m_onLoaded;
+		public UnityEvent<T> onSaved => m_onSaved;
 
 		#endregion
 
@@ -87,20 +100,36 @@ namespace ToolkitEngine.SaveManagement
 		}
 
 		[ContextMenu("Load")]
-		public void Load()
+		public virtual void Load()
 		{
 			if (m_variable.isDefined)
 			{
-				m_memberInfo.SetMemberValue(m_component, m_variable.value);
+				Set(m_variable.value);
+				m_onLoaded?.Invoke(m_variable.value);
 			}
 		}
 
 		[ContextMenu("Save")]
 		public void Save()
 		{
-			if (m_variable.isDefined)
+			if (m_variable.isDefined && m_memberInfo != null)
 			{
 				m_variable.value = (T)m_memberInfo.GetMemberValue(m_component);
+				m_onSaved?.Invoke(m_variable.value);
+			}
+		}
+
+		public T Get() => m_variable.value;
+
+		public void Set(T value)
+		{
+			if (m_variable.isDefined)
+			{
+				m_variable.value = value;
+				if (m_memberInfo != null)
+				{
+					m_memberInfo.SetMemberValue(m_component, m_variable.value);
+				}
 			}
 		}
 

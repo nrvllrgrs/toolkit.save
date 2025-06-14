@@ -8,7 +8,7 @@ using UnityEngine;
 namespace ToolkitEditor.SaveManagement
 {
     [CustomEditor(typeof(BaseVariableStorage<,>), true)]
-    public class BaseVariableStorageEditor : Editor
+    public class BaseVariableStorageEditor : BaseToolkitEditor
     {
 		#region Fields
 
@@ -21,13 +21,16 @@ namespace ToolkitEditor.SaveManagement
 		protected SerializedProperty m_loadOnStart;
 		protected SerializedProperty m_saveOnDestroy;
 
+		protected SerializedProperty m_onLoaded;
+		protected SerializedProperty m_onSaved;
+
 		private System.Type m_variableType;
 
 		#endregion
 
 		#region Methods
 
-		private void OnEnable()
+		protected virtual void OnEnable()
 		{
 			m_variableType = (target as IVariableStorage).variableType;
 
@@ -39,12 +42,13 @@ namespace ToolkitEditor.SaveManagement
 			m_variable = serializedObject.FindProperty(nameof(m_variable));
 			m_loadOnStart = serializedObject.FindProperty(nameof(m_loadOnStart));
 			m_saveOnDestroy = serializedObject.FindProperty(nameof(m_saveOnDestroy));
+
+			m_onLoaded = serializedObject.FindProperty(nameof(m_onLoaded));
+			m_onSaved = serializedObject.FindProperty(nameof(m_onSaved));
 		}
 
-		public override void OnInspectorGUI()
+		protected override void DrawProperties()
 		{
-			serializedObject.Update();
-
 			EditorGUI.BeginChangeCheck();
 			{
 				EditorGUILayout.PropertyField(m_object, new GUIContent("Owner"));
@@ -92,8 +96,6 @@ namespace ToolkitEditor.SaveManagement
 			EditorGUILayout.PropertyField(m_variable);
 			EditorGUILayout.PropertyField(m_loadOnStart);
 			EditorGUILayout.PropertyField(m_saveOnDestroy);
-
-			serializedObject.ApplyModifiedProperties();
 		}
 
 		private void PopulateDropDown(GenericMenu menu, Component[] components)
@@ -139,6 +141,15 @@ namespace ToolkitEditor.SaveManagement
 			m_isProperty.boolValue = menuEventArgs.isProperty;
 
 			serializedObject.ApplyModifiedProperties();
+		}
+
+		protected override void DrawEvents()
+		{
+			if (EditorGUILayoutUtility.Foldout(m_onLoaded, "Events"))
+			{
+				EditorGUILayout.PropertyField(m_onLoaded);
+				EditorGUILayout.PropertyField(m_onSaved);
+			}
 		}
 
 		#endregion
