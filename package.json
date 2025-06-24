@@ -12,5 +12,13 @@
 	"repository": {
 		"url": "https://github.com/nrvllrgrs/toolkit.save.git",
 		"type": "git"
-	}
+	},
+	"samples": [
+		{
+			"displayName": "Visual Scripting",
+			"description": "Visual Scripting",
+			"path": "Samples~/Visual Scripting"
+		}
+	]
 }
+    

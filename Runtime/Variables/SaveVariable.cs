@@ -12,6 +12,12 @@ namespace ToolkitEngine.SaveManagement
 		protected string m_id;
 
 		#endregion
+
+		#region Properites
+
+		public string id => m_id;
+
+		#endregion
 	}
 
 	[System.Serializable]
@@ -31,7 +37,7 @@ namespace ToolkitEngine.SaveManagement
 			}
 			set
 			{
-				SaveManager.CastInstance.TrySetValue<T>(m_id, value);
+				SaveManager.CastInstance.TrySetValue(m_id, value);
 			}
 		}
 

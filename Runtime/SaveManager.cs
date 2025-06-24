@@ -7,57 +7,42 @@ using UnityEngine;
 
 namespace ToolkitEngine.SaveManagement
 {
-	public class VariableEventArgs : EventArgs
+	public abstract class VariableEventArgs : EventArgs
 	{
 		#region Properties
 
-		public string variableName { get; private set; }
-		public bool boolValue { get; private set; }
-		public float floatValue { get; private set; }
-		public string stringValue { get; private set; }
+		public string variableName { get; protected set; }
+		public abstract object value { get; }
 
 		#endregion
 
 		#region Constructors
 
-		private VariableEventArgs(string variableName)
+		protected VariableEventArgs(string variableName)
 		{
 			this.variableName = variableName;
 		}
 
-		public VariableEventArgs(string variableName, object value)
-			: this(variableName)
-		{
-			if (value is bool)
-			{
-				boolValue = (bool)value;
-			}
-			else if (value is float)
-			{
-				floatValue = (float)value;
-			}
-			else if (value is string)
-			{
-				stringValue = (string)value;
-			}
-		}
+		#endregion
+	}
 
-		public VariableEventArgs(string variableName, bool value)
-			: this(variableName)
-		{
-			boolValue = value;
-		}
+	public class VariableEventArgs<T, K> : VariableEventArgs
+		where K : SaveVariable<T>
+	{
+		#region Properties
 
-		public VariableEventArgs(string variableName, float value)
-			: this(variableName)
-		{
-			floatValue = value;
-		}
+		public K variable { get; protected set; }
+		public override object value => castValue;
+		public T castValue => variable.value;
 
-		public VariableEventArgs(string variableName, string value)
-			: this(variableName)
+		#endregion
+
+		#region Constructors
+
+		public VariableEventArgs(string variableName, K variableValue)
+			: base(variableName)
 		{
-			stringValue = value;
+			variable = variableValue;
 		}
 
 		#endregion
@@ -138,7 +123,6 @@ namespace ToolkitEngine.SaveManagement
 
 			return m_variableMap.ContainsKey(id);
 		}
-
 
 		public bool TryGetValue<T>(string id, out T value)
 		{
