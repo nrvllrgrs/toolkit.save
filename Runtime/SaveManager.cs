@@ -1,4 +1,5 @@
 using OdinSerializer;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,12 +7,74 @@ using UnityEngine;
 
 namespace ToolkitEngine.SaveManagement
 {
+	public class VariableEventArgs : EventArgs
+	{
+		#region Properties
+
+		public string variableName { get; private set; }
+		public bool boolValue { get; private set; }
+		public float floatValue { get; private set; }
+		public string stringValue { get; private set; }
+
+		#endregion
+
+		#region Constructors
+
+		private VariableEventArgs(string variableName)
+		{
+			this.variableName = variableName;
+		}
+
+		public VariableEventArgs(string variableName, object value)
+			: this(variableName)
+		{
+			if (value is bool)
+			{
+				boolValue = (bool)value;
+			}
+			else if (value is float)
+			{
+				floatValue = (float)value;
+			}
+			else if (value is string)
+			{
+				stringValue = (string)value;
+			}
+		}
+
+		public VariableEventArgs(string variableName, bool value)
+			: this(variableName)
+		{
+			boolValue = value;
+		}
+
+		public VariableEventArgs(string variableName, float value)
+			: this(variableName)
+		{
+			floatValue = value;
+		}
+
+		public VariableEventArgs(string variableName, string value)
+			: this(variableName)
+		{
+			stringValue = value;
+		}
+
+		#endregion
+	}
+
 	public class SaveManager : ConfigurableSubsystem<SaveManager, SaveManagerConfig>
     {
 		#region Fields
 
 		private Dictionary<string, object> m_variableMap = new();
 		private HashSet<ISaveable> m_saveables = new();
+
+		#endregion
+
+		#region Events
+
+		public event EventHandler<VariableEventArgs> VariableChanged;
 
 		#endregion
 
@@ -148,5 +211,15 @@ namespace ToolkitEngine.SaveManagement
 		}
 
 		#endregion
+
+		#region Variable Methods
+
+		public void InvokeVariableChanged(VariableEventArgs e)
+		{
+			VariableChanged?.Invoke(this, e);
+		}
+		
+		#endregion
+
 	}
 }
